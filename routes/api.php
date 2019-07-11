@@ -21,5 +21,5 @@ Route::post('auth/register', 'AuthController@register');
 Route::post('auth/login', 'AuthController@login');
 Route::post('customer/store', 'PelangganController@store');
 Route::post('customer/search', 'PelangganController@search');
-Route::get('users', 'UserController@users');
-Route::get('pelanggan', 'PelangganController@getPelanggan');
+Route::get('admin/users', 'UserController@users');
+Route::get('customer/all', 'PelangganController@getPelanggan');
