@@ -65,7 +65,7 @@ class pelangganController extends Controller
 					->orWhere('no_telepon', 'like', '%'.$params.'%')
 					->get();
 
-		if ($params == null) 
+		if ($result->isEmpty()) 
 		{
     		return response()->json(['errorCode' => 0, 'data' => []], 200);
 		}
