@@ -22,3 +22,4 @@ Route::post('auth/login', 'AuthController@login');
 Route::post('store', 'PelangganController@store');
 Route::post('search', 'PelangganController@search');
 Route::get('users', 'UserController@users');
+Route::get('pelanggan', 'PelangganController@getPelanggan');

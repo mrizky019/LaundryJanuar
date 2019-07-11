@@ -12,11 +12,12 @@ class UserController extends Controller
     {
     	$users = $user->all();
 
-    	$response = fractal()
-			->collection($users)
-			->transformWith(new UserTransformer)
-			->toArray();
+    	$response = [
+			'errorCode' => 0,
+			'data' => $users			
+		];
 
-		return response()->json($response, 201);
+		return response()->json($users, 200);
+
     }
 }

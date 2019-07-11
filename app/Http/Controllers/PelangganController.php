@@ -3,18 +3,32 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Transformers\PelangganTransformer;
 use App\Pelanggan;
 use DB;
 
 class pelangganController extends Controller
 {
+
+	public function getPelanggan(Pelanggan $pelanggan)
+	{
+		$pelanggan = $pelanggan->all();
+
+		$response = [
+			'errorCode' => 0,
+			'data' => $pelanggan			
+		];
+
+		return response()->json($response, 200);
+	}
+
     public function store(Request $request, Pelanggan $pelanggan)
     {
     	$pelangganIsExist = DB::table('pelanggan')->where('email',$request->email)->first();
 
     	if ($pelangganIsExist) {
 
-    		return response()->json(['errorCode' => -1,'message' => 'Email was taken'], 409);
+    		return response()->json(['errorCode' => -1,'message' => 'Email sudah digunakan'], 409);
 
     	} else {
 

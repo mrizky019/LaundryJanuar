@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Transformers\UserTransformer;
 use App\User;
 use Auth;
+use DB;
 
 class AuthController extends Controller 
 {
@@ -13,23 +14,32 @@ class AuthController extends Controller
 
 	public function register(Request $request, User $user) 
 	{
-		$this->validate($request, [
-			'name' 		=> 'required',
-			'email'		=> 'required|email|unique:users', 
-			'password'	=> 'required|min:6'
-		]);
 
-		$userResponse = $user->create([
-			'name' 		=> $request->name,
-			'email' 	=> $request->email,
-			'password' 	=> bcrypt($request->password),
-			'id_cabang'	=> $request->id_cabang
-		]);
+    	$usersIsExist = DB::table('users')->where('email',$request->email)->first();
 
-		$response = fractal()
-			->item($userResponse)
-			->transformWith(new UserTransformer)
-			->toArray();
+    	if ($usersIsExist) {
+    		return response()->json(['errorCode' => -1,'message' => 'Email sudah digunakan'], 409);
+
+    	} else {
+
+			$this->validate($request, [
+				'name' 		=> 'required',
+				'email'		=> 'required|email|unique:users', 
+				'password'	=> 'required|min:6'
+			]);
+
+			$userResponse = $user->create([
+				'name' 		=> $request->name,
+				'email' 	=> $request->email,
+				'password' 	=> bcrypt($request->password),
+				'id_cabang'	=> $request->id_cabang
+			]);
+
+			$response = [
+				'errorCode' => 0,
+				'data' 		=> $userResponse
+			];
+    	}
 
 		return response()->json($response, 201);
 	}
