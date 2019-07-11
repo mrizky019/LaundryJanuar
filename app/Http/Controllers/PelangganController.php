@@ -28,7 +28,7 @@ class pelangganController extends Controller
 
     	if ($pelangganIsExist) {
 
-    		return response()->json(['errorCode' => -1,'message' => 'Email sudah digunakan'], 409);
+    		return response()->json(['errorCode' => -1, 200);
 
     	} else {
 
