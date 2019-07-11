@@ -18,7 +18,7 @@ class AuthController extends Controller
     	$usersIsExist = DB::table('users')->where('email',$request->email)->first();
 
     	if ($usersIsExist) {
-    		return response()->json(['errorCode' => -1, 200);
+    		return response()->json(['errorCode' => -1], 200);
 
     	} else {
 
