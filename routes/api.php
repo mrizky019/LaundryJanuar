@@ -20,6 +20,6 @@ use Illuminate\Http\Request;
 Route::post('auth/register', 'AuthController@register');
 Route::post('auth/login', 'AuthController@login');
 Route::post('customer/store', 'PelangganController@store');
-Route::post('customer/search', 'PelangganController@search');
+Route::get('customer/search/', 'PelangganController@search');
 Route::get('admin/users', 'UserController@users');
 Route::get('customer/all', 'PelangganController@getPelanggan');

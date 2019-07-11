@@ -28,7 +28,7 @@ class pelangganController extends Controller
 
     	if ($pelangganIsExist) {
 
-    		return response()->json(['errorCode' => -1], 200);
+    		return response()->json(['errorCode' => -1, 'data' => []], 200);
 
     	} else {
 
@@ -58,26 +58,18 @@ class pelangganController extends Controller
 
     public function search(Request $request)
     {
-		$data = $request->data;
+		$params = $request->get('q');
 
-		$result = DB::table('pelanggan')
-					->select('nama','email','no_telepon','alamat')
-					->where('nama', 'like', '%'.$data.'%')
-					->orWhere('email', 'like', '%'.$data.'%')
-					->orWhere('no_telepon', 'like', '%'.$data.'%')
+		$result = Pelanggan::where('nama', 'like', '%'.$params.'%')
+					->orWhere('email', 'like', '%'.$params.'%')
+					->orWhere('no_telepon', 'like', '%'.$params.'%')
 					->get();
 
-		if ($result->isEmpty()) {
-    		return response()->json(['errorCode' => -1,'message' => 'pelanggan tidak ditemukan'], 404);
-	
-		} else {
-        	$response = [
-				'errorCode' => 0,
-				'data' 		=> $result
-			];
-		
+		if ($params == null) 
+		{
+    		return response()->json(['errorCode' => 0, 'data' => []], 200);
 		}
 
-        return response()->json($response, 200);
+        return response()->json(['errorCode' => 0, 'data' => $result], 200);
     }
 }
