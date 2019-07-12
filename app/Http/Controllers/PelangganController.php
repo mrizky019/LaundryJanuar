@@ -96,8 +96,12 @@ class pelangganController extends Controller
     	return response()->json($response, 200);
     }
 
-    public function delete(Request $request, Pelanggan $pelanggan)
+    public function destroy($id_pelanggan)
     {
+		$pelanggan = Pelanggan::find($id_pelanggan);
 
+		$pelanggan->delete();
+
+		return response()->json(['errorCode' => 0, 'data' => []], 200);
     }
 }
