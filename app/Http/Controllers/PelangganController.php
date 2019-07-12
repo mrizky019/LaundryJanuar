@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Input;
 use App\Transformers\PelangganTransformer;
 use App\Pelanggan;
 use DB;
@@ -71,5 +72,32 @@ class pelangganController extends Controller
 		}
 
         return response()->json(['errorCode' => 0, 'data' => $result], 200);
+    }
+
+    public function update(Request $request, $id_pelanggan)
+    {
+
+		$pelanggan = Pelanggan::find($id_pelanggan);
+
+		$pelanggan->fill($request->all());
+
+    	$pelanggan->save();
+
+    	$response = [
+    		'errorCode' => 0,
+    		'data'	=> [
+    			'id_pelanggan'	=> $id_pelanggan,
+    			'email'			=> $pelanggan->email,
+		    	'nama'			=> $pelanggan->nama,
+		    	'no_telepon' 	=> $pelanggan->no_telepon,
+		    	'alamat'		=> $pelanggan->alamat,
+    		]
+    	];
+    	return response()->json($response, 200);
+    }
+
+    public function delete(Request $request, Pelanggan $pelanggan)
+    {
+
     }
 }

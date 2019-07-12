@@ -8,6 +8,7 @@ class Pelanggan extends Model
 {
 	public $table = 'pelanggan';
 	public $timestamps = false;
+	protected $primaryKey = 'id_pelanggan';
 
     protected $fillable = [
     	'id_pelanggan', 'email', 'nama', 'no_telepon', 'alamat'
