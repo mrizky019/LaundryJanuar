@@ -17,11 +17,21 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // });
 
+//Route Users
+Route::get('admin', 'UserController@show');
 Route::post('auth/register', 'AuthController@register');
 Route::post('auth/login', 'AuthController@login');
+
+//Route Customer
 Route::post('customer/store', 'PelangganController@store');
 Route::put('customer/update/{id_pelanggan}', 'PelangganController@update');
 Route::delete('customer/delete/{id_pelanggan}', 'PelangganController@destroy');
 Route::get('customer/search', 'PelangganController@search');
-Route::get('customer/all', 'PelangganController@getPelanggan');
-Route::get('admin/users', 'UserController@users');
+Route::get('customer', 'PelangganController@show');
+
+//Route Pegawai
+Route::post('pegawai/store', 'PegawaiController@store');
+Route::put('pegawai/update/{id_pegawai}', 'PegawaiController@update');
+Route::delete('pegawai/delete/{id_pegawai}', 'PegawaiController@destroy');
+Route::get('pegawai/search', 'PegawaiController@search');
+Route::get('pegawai', 'PegawaiController@show');

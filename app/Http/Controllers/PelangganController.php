@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Input;
-use App\Transformers\PelangganTransformer;
 use App\Pelanggan;
 use DB;
 
 class pelangganController extends Controller
 {
 
-	public function getPelanggan(Pelanggan $pelanggan)
+	public function show(Pelanggan $pelanggan)
 	{
 		$pelanggan = $pelanggan->all();
 
@@ -33,20 +31,22 @@ class pelangganController extends Controller
 
     	} else {
 
-    		$pelangganResponse 	= $pelanggan->create([
-    			'id_pelanggan'	=> $request->id_pelanggan,
-				'nama' 			=> $request->nama,
-				'email' 		=> $request->email,
-				'no_telepon'	=> $request->no_telepon,
-				'alamat'		=> $request->alamat
-			]);
+    		$params = '@o_id_pelanggan';
+
+    		DB::select("CALL procedure_new_pelanggan(
+    			'$request->email', 
+    			'$request->nama', 
+    			'$request->no_telepon', 
+    			'$request->alamat', 
+    			 $params
+    		)");
+
 
     		$response = [
 				'errorCode' => 0,
 				'data' 		=> [
-					'id_pelanggan'	=> $request->id_pelanggan,
-					'nama' 			=> $request->nama,
 					'email' 		=> $request->email,
+					'nama' 			=> $request->nama,
 					'no_telepon'	=> $request->no_telepon,
 					'alamat'		=> $request->alamat
 				]
@@ -98,10 +98,22 @@ class pelangganController extends Controller
 
     public function destroy($id_pelanggan)
     {
-		$pelanggan = Pelanggan::find($id_pelanggan);
+   		$result = DB::table('transaksi_laundry')
+		            ->join('pelanggan', 'transaksi_laundry.id_pelanggan', '=', 'pelanggan.id_pelanggan')
+		            ->select(DB::raw('transaksi_laundry.id_pelanggan as id_pelanggan'))
+		            ->where('transaksi_laundry.id_pelanggan', $id_pelanggan)
+		            ->get();
 
-		$pelanggan->delete();
+		if ($result->isEmpty()) {
+			$pelanggan = Pelanggan::find($id_pelanggan);
+			$pelanggan->delete();
 
-		return response()->json(['errorCode' => 0, 'data' => []], 200);
+			return response()->json(['errorCode' => 0, 'data' => []], 200);
+		} else {
+			return response()->json(['errorCode' => -1, 'data' => []], 200);
+
+		}
+
+
     }
 }

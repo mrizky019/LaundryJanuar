@@ -8,7 +8,7 @@ use App\Transformers\UserTransformer;
 
 class UserController extends Controller 
 {
-    public function users(User $user)
+    public function show(User $user)
     {
     	$users = $user->all();
 
