@@ -31,18 +31,14 @@ class PegawaiController extends Controller
     		'$request->alamat',
     		'$request->no_telp',
     		'$request->is_active',
-    		 $params
+             $params
     	)");
+
+        $result = DB::select('select * from pegawai where id_pegawai = @o_id_pegawai');
 
     	$response = [
 			'errorCode' => 0,
-			'data' 		=> [
-				'id_cabang' 	=> $request->id_cabang,
-				'nama' 			=> $request->nama,
-				'alamat'		=> $request->alamat,
-				'no_telp'		=> $request->no_telp,
-				'is_active'		=> $request->is_active
-			]
+			'data' 		=> $result
 		];
 
 		return response()->json($response, 200);
