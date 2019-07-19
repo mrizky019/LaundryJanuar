@@ -50,7 +50,7 @@ class AuthController extends Controller
 			'email' => $request->email,
 			'password' => $request->password
 		])) {
-			return response()->json(['errorCode' => -1,'data' => []], 401);
+			return response()->json(['errorCode' => -1,'data' => null], 200);
 		}
 
 		$user = $user->find(Auth::user()->id);

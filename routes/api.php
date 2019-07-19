@@ -24,7 +24,7 @@ Route::post('auth/login', 'AuthController@login');
 
 //Route Customer
 Route::post('customer/store', 'PelangganController@store');
-Route::put('customer/update/{id_pelanggan}', 'PelangganController@update');
+Route::put('customer/update', 'PelangganController@update');
 Route::delete('customer/delete/{id_pelanggan}', 'PelangganController@destroy');
 Route::get('customer/search', 'PelangganController@search');
 Route::get('customer', 'PelangganController@show');

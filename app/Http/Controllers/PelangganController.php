@@ -21,13 +21,13 @@ class pelangganController extends Controller
 		return response()->json($response, 200);
 	}
 
-    public function store(Request $request, Pelanggan $pelanggan)
+    public function store(Request $request)
     {
     	$pelangganIsExist = DB::table('pelanggan')->where('email',$request->email)->first();
 
     	if ($pelangganIsExist) {
 
-    		return response()->json(['errorCode' => -1, 'data' => []], 200);
+    		return response()->json(['errorCode' => -1, 'data' => null], 200);
 
     	} else {
 
@@ -74,26 +74,33 @@ class pelangganController extends Controller
         return response()->json(['errorCode' => 0, 'data' => $result], 200);
     }
 
-    public function update(Request $request, $id_pelanggan)
+    public function update(Request $request)
     {
 
-		$pelanggan = Pelanggan::find($id_pelanggan);
+		$pelanggan = Pelanggan::find($request->id_pelanggan);
+		$pelangganEmail = Pelanggan::where('email', $request->email)->get()[0];
 
-		$pelanggan->fill($request->all());
 
-    	$pelanggan->save();
+		if($pelanggan->email == $request->email || $pelangganEmail == null){
+			$pelanggan->fill($request->all());
 
-    	$response = [
-    		'errorCode' => 0,
-    		'data'	=> [
-    			'id_pelanggan'	=> $id_pelanggan,
-    			'email'			=> $pelanggan->email,
-		    	'nama'			=> $pelanggan->nama,
-		    	'no_telepon' 	=> $pelanggan->no_telepon,
-		    	'alamat'		=> $pelanggan->alamat,
-    		]
-    	];
-    	return response()->json($response, 200);
+			$pelanggan->save();
+
+			$response = [
+				'errorCode' => 0,
+				'data'	=> [
+					'id_pelanggan'	=> $request->id_pelanggan,
+					'email'			=> $pelanggan->email,
+					'nama'			=> $pelanggan->nama,
+					'no_telepon' 	=> $pelanggan->no_telepon,
+					'alamat'		=> $pelanggan->alamat,
+				]
+			];
+			return response()->json($response, 200);
+
+		} else {
+			return response()->json(['errorCode' => -1, 'data' => null]);
+		}
     }
 
     public function destroy($id_pelanggan)
@@ -108,9 +115,9 @@ class pelangganController extends Controller
 			$pelanggan = Pelanggan::find($id_pelanggan);
 			$pelanggan->delete();
 
-			return response()->json(['errorCode' => 0, 'data' => []], 200);
+			return response()->json(['errorCode' => 0, 'data'=>null], 200);
 		} else {
-			return response()->json(['errorCode' => -1, 'data' => []], 200);
+			return response()->json(['errorCode' => -1, 'data' => null], 200);
 
 		}
 
