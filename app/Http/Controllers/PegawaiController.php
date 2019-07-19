@@ -21,7 +21,7 @@ class PegawaiController extends Controller
 		return response()->json($response, 200);
     }
 
-    public function store(Request $request, Pegawai $pegawai)
+    public function store(Request $request)
     {
     	$params = '@o_id_pegawai';
 
@@ -44,7 +44,7 @@ class PegawaiController extends Controller
 		return response()->json($response, 200);
     }
 
-    public function update(Request $request, $id_pegawai)
+    public function update(Request $request)
     {
     	$pegawai = Pegawai::find($id_pegawai);
 
@@ -55,7 +55,7 @@ class PegawaiController extends Controller
     	$response = [
     		'errorCode' => 0,
     		'data'	=> [
-    			'id_pegawai'	=> $id_pegawai,
+    			'id_pegawai'	=> $request->id_pegawai,
 				'id_cabang' 	=> $pegawai->id_cabang,
 				'nama' 			=> $pegawai->nama,
 				'alamat'		=> $pegawai->alamat,
