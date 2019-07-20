@@ -9,6 +9,7 @@ class Pegawai extends Model
     public $table = 'pegawai';
 	public $timestamps = false;
 	protected $primaryKey = 'id_pegawai';
+	public $incrementing = false;
 
     protected $fillable = [
     	'id_pelanggan',
@@ -16,6 +17,6 @@ class Pegawai extends Model
     	'nama',
     	'alamat',
     	'no_telp',
-    	'is_actve'
+    	'is_active'
     ];
 }

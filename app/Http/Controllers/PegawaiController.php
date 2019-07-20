@@ -38,7 +38,7 @@ class PegawaiController extends Controller
 
     	$response = [
 			'errorCode' => 0,
-			'data' 		=> $result
+			'data' 		=> $result[0]
 		];
 
 		return response()->json($response, 200);
@@ -46,7 +46,7 @@ class PegawaiController extends Controller
 
     public function update(Request $request)
     {
-    	$pegawai = Pegawai::find($id_pegawai);
+    	$pegawai = Pegawai::find($request->id_pegawai);
 
 		$pegawai->fill($request->all());
 
@@ -60,7 +60,7 @@ class PegawaiController extends Controller
 				'nama' 			=> $pegawai->nama,
 				'alamat'		=> $pegawai->alamat,
 				'no_telp'		=> $pegawai->no_telp,
-				'is_active'		=> $pegawai->is_actve
+				'is_active'		=> $pegawai->is_active
     		]
     	];
     	return response()->json($response, 200);
@@ -78,15 +78,33 @@ class PegawaiController extends Controller
     		$pegawai = Pegawai::find($id_pegawai);
 			$pegawai->delete();
 
-			return response()->json(['errorCode' => 0, 'data' => []], 200);
+			return response()->json(['errorCode' => 0, 'data' => null], 200);
 
     	} else {
-    		$pegawai = Pegawai::find($id_pegawai);
-    		DB::table('pegawai')
-	            ->where('id_pegawai', $id_pegawai)
-	            ->update(['is_actve' => 0]);
+    		// $pegawai = Pegawai::find($id_pegawai);
+    		// DB::table('pegawai')
+	        //     ->where('id_pegawai', $id_pegawai)
+	        //     ->update(['is_actve' => 0]);
 
-			return response()->json(['errorCode' => 0, 'data' => []], 200);
+			return response()->json(['errorCode' => -1, 'data' => null], 200);
     	}
+	}
+	
+	public function searchByBranch(Request $request)
+    {
+		$params = $request->get('q');
+		$branch =  $request->get('branch');
+
+		$result = Pegawai::where('id_cabang', $branch)
+					->where('nama', 'like', "%$params%")
+					->orWhere('no_telp', 'like', "%$params%")
+					->get();
+
+		if ($result->isEmpty()) 
+		{
+    		return response()->json(['errorCode' => 0, 'data' => []], 200);
+		}
+
+        return response()->json(['errorCode' => 0, 'data' => $result], 200);
     }
 }

@@ -31,6 +31,7 @@ Route::get('customer', 'PelangganController@show');
 
 //Route Pegawai
 Route::post('pegawai/store', 'PegawaiController@store');
+Route::get('pegawai/searchByBranch', 'PegawaiController@searchByBranch');
 Route::put('pegawai/update', 'PegawaiController@update');
 Route::delete('pegawai/delete/{id_pegawai}', 'PegawaiController@destroy');
 Route::get('pegawai/search', 'PegawaiController@search');
