@@ -41,7 +41,7 @@ class pelangganController extends Controller
     			 $params
     		)");
 
-			$result = DB::select('select * from pelanggan where id_pelanggan = @o_id_pelanggan');    		
+			$result = DB::select('select * from pelanggan where id_pelanggan = @o_id_pelanggan')[0];    		
 
     		$response = [
 				'errorCode' => 0,
