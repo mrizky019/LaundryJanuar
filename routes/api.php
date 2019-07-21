@@ -36,3 +36,6 @@ Route::put('pegawai/update', 'PegawaiController@update');
 Route::delete('pegawai/delete/{id_pegawai}', 'PegawaiController@destroy');
 Route::get('pegawai/search', 'PegawaiController@search');
 Route::get('pegawai', 'PegawaiController@show');
+
+//Route Menu
+Route::get('menu/show', 'MenuController@show');
