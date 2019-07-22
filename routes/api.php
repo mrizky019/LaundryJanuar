@@ -39,3 +39,6 @@ Route::get('pegawai', 'PegawaiController@show');
 
 //Route Menu
 Route::get('menu/show', 'MenuController@show');
+
+//Route Transaksi
+Route::post('transaksi/store', 'TransaksiController@store');
