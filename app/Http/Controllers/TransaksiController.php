@@ -20,16 +20,17 @@ class TransaksiController extends Controller
     		 $params
     	)");
 
-    	$data = DB::select('select @o_id_transaksi_laundry as id_transaksi')[0];
+    	$data = DB::select('select @o_id_transaksi_laundry as id_transaksi_laundry')[0];
 
         DB::select("CALL procedure_new_detail_laundry(
-        	'$data->id_transaksi',
+        	'$data->id_transaksi_laundry',
         	'$request->id_menu',
-        	'$request->real_quantity'
+        	'$request->real_quantity',
+        	'$request->info'
         )");
 
         $result = DB::table('view_laporan_transaksi_cabang')
-        ->where('id_transaksi_laundry', $data->id_transaksi)->get();
+        ->where('id_transaksi_laundry', $data->id_transaksi_laundry)->get();
 
         $response = [
         	'errorCode' => 0,
