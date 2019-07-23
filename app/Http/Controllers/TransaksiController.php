@@ -12,7 +12,6 @@ class TransaksiController extends Controller
 
     public function store(Request $request)
     {
-		$params = '@o_id_transaksi_laundry';
 
 		DB::statement("CALL procedure_new_transaksi_laundry(:id_cabang, :id_pelanggan, @o_id_transaksi_laundry)",
 			array(
@@ -41,5 +40,20 @@ class TransaksiController extends Controller
         ];
 
         return response()->json($response, 200);
-    }
+	}
+	
+	public function showUnfinished(Request $request){
+		$result = DB::table('view_laporan_transaksi_cabang')
+		->where('id_cabang', $request->id_cabang)
+		->where('is_paid', '<>', 1)
+		->where('is_taken', '<>', 1)->get();
+
+		if ($result->isEmpty()) 
+		{
+    		return response()->json(['errorCode' => 0, 'data' => []], 200);
+		}
+
+        return response()->json(['errorCode' => 0, 'data' => $result], 200);
+		
+	}
 }

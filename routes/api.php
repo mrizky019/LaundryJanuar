@@ -42,3 +42,10 @@ Route::get('menu/show', 'MenuController@show');
 
 //Route Transaksi
 Route::post('transaksi/store', 'TransaksiController@store');
+Route::get('transaksi/showUnfinished', 'TransaksiController@showUnfinished');
+
+//Route AktivitasLaundry
+
+Route::get('aktivitaslaundry/show', 'AktivitasLaundryController@show');
+Route::post('aktivitaslaundry/melakukanAktivitasLaundry', 'AktivitasLaundryController@melakukanAktivitasLaundry');
+Route::post('aktivitaslaundry/menyelesaikanAktivitasLaundry', 'AktivitasLaundryController@menyelesaikanAktivitasLaundry');
