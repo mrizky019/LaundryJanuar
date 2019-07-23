@@ -33,13 +33,14 @@ class pelangganController extends Controller
 
     		$params = '@o_id_pelanggan';
 
-    		DB::select("CALL procedure_new_pelanggan(
-    			'$request->email', 
-    			'$request->nama', 
-    			'$request->no_telepon', 
-    			'$request->alamat', 
-    			 $params
-    		)");
+			DB::statement("CALL procedure_new_pelanggan(:email, :nama, :no_telepon, :alamat, @o_id_pelanggan)",
+				array(
+					'email' => $request->email,
+					'nama' => $request->nama,
+					'no_telepon' => $request->no_telepon,
+					'alamat' => $request->alamat
+				)
+    		);
 
 			$result = DB::select('select * from pelanggan where id_pelanggan = @o_id_pelanggan')[0];    		
 

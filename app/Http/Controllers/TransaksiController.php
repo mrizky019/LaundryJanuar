@@ -14,15 +14,16 @@ class TransaksiController extends Controller
     {
 		$params = '@o_id_transaksi_laundry';
 
-    	DB::select("CALL procedure_new_transaksi_laundry(
-    		'$request->id_cabang',
-    		'$request->id_pelanggan',
-    		 $params
-    	)");
+		DB::statement("CALL procedure_new_transaksi_laundry(:id_cabang, :id_pelanggan, @o_id_transaksi_laundry)",
+			array(
+				'id_cabang'=> $request->id_cabang,
+				'id_pelanggan' => $request->id_pelanggan
+			)	
+			);
 
     	$data = DB::select('select @o_id_transaksi_laundry as id_transaksi_laundry')[0];
 
-        DB::select("CALL procedure_new_detail_laundry(:id_transaksi_laundry, :id_menu, :real_quantity, :info)", 
+        DB::statement("CALL procedure_new_detail_laundry(:id_transaksi_laundry, :id_menu, :real_quantity, :info)", 
         	array(
 	        	'id_transaksi_laundry' => $data->id_transaksi_laundry,
 	        	'id_menu'	=> $request->id_menu,
@@ -32,7 +33,7 @@ class TransaksiController extends Controller
         );
 
         $result = DB::table('view_laporan_transaksi_cabang')
-        ->where('id_transaksi_laundry', $data->id_transaksi_laundry)->get();
+        ->where('id_transaksi_laundry', $data->id_transaksi_laundry)->get()[0];
 
         $response = [
         	'errorCode' => 0,

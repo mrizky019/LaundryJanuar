@@ -23,16 +23,15 @@ class PegawaiController extends Controller
 
     public function store(Request $request)
     {
-    	$params = '@o_id_pegawai';
-
-    	DB::select("CALL procedure_new_pegawai(
-    		'$request->id_cabang',
-    		'$request->nama',
-    		'$request->alamat',
-    		'$request->no_telp',
-    		'$request->is_active',
-             $params
-    	)");
+		DB::statement("CALL procedure_new_pegawai(:id_cabang, :nama, :alamat, :no_telp, :is_active)",
+			array(
+				'id_cabang' => $request->id_cabang,
+				'nama' => $request->nama,
+				'alamat' => $request->alamat,
+				'no_telp' => $request->no_telp,
+				'is_active' => $request->is_active
+			)   
+		);
 
         $result = DB::select('select * from pegawai where id_pegawai = @o_id_pegawai');
 
@@ -96,8 +95,7 @@ class PegawaiController extends Controller
 		$branch =  $request->get('branch');
 
 		$result = Pegawai::where('id_cabang', $branch)
-					->where('nama', 'like', "%$params%")
-					->orWhere('no_telp', 'like', "%$params%")
+					->whereRaw('nama like ? or no_telp like ?', array("%{$params}%", "%{$params}%"))
 					->get();
 
 		if ($result->isEmpty()) 
