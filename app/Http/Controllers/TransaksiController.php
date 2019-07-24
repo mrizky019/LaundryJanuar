@@ -41,7 +41,7 @@ class TransaksiController extends Controller
 
         return response()->json($response, 200);
 	}
-	
+
 	public function showUnfinished(Request $request){
 		$result = DB::table('view_laporan_transaksi_cabang')
 		->where('id_cabang', $request->id_cabang)
@@ -54,6 +54,31 @@ class TransaksiController extends Controller
 		}
 
         return response()->json(['errorCode' => 0, 'data' => $result], 200);
-		
+	}
+
+	public function paidTransaction(Request $request){
+		$paid = DB::statement("CALL procedure_paid_laundry(:id_transaksi)", array(
+			"id_transaksi" => $request->id_transaksi
+		));
+
+		$response = [
+			'errorCode' => 0,
+			'data' => null
+		];
+
+		return response()->json($response, 200);
+	}
+
+	public function takeTransaction(Request $request){
+		$taken = DB::statement("CALL procedure_pengambilan_laundry(:id_transaksi)", array(
+			"id_transaksi" => $request->id_transaksi
+		));
+
+		$response = [
+			'errorCode' => 0,
+			'data' => null
+		];
+
+		return response()->json($response, 200);
 	}
 }
