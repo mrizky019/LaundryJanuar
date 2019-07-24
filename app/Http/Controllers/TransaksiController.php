@@ -18,7 +18,7 @@ class TransaksiController extends Controller
 				'id_cabang'=> $request->id_cabang,
 				'id_pelanggan' => $request->id_pelanggan
 			)	
-			);
+		);
 
     	$data = DB::select('select @o_id_transaksi_laundry as id_transaksi_laundry')[0];
 
@@ -70,6 +70,20 @@ class TransaksiController extends Controller
 	}
 
 	public function takeTransaction(Request $request){
+		
+		$exists = DB::table('transaksi_laundry')
+				->where('id_transaksi_laundry', $request->id_transaksi)
+				->first();
+		
+
+		if($exists == null){
+			return response()->json(['errorCode' => -98, 'data' => null]);
+		}
+
+		if($exists->is_paid == 1){
+			return response()->json(['errorCode' => -1, 'data' => null]);
+		}
+
 		$taken = DB::statement("CALL procedure_pengambilan_laundry(:id_transaksi)", array(
 			"id_transaksi" => $request->id_transaksi
 		));
