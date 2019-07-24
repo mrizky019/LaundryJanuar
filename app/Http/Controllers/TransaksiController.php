@@ -42,11 +42,24 @@ class TransaksiController extends Controller
         return response()->json($response, 200);
 	}
 
+	public function getTransaction(Request $request){
+		$result = DB::table('view_laporan_transaksi_cabang')
+		->where('id_transaksi_laundry', $request->id_transaksi_laundry)->first();
+
+		$response = [
+			'errorCode' => 0,
+			'data' => $result
+		];
+
+		return response()->json($response, 200);
+	}
+
 	public function showUnfinished(Request $request){
 		$result = DB::table('view_laporan_transaksi_cabang')
 		->where('id_cabang', $request->id_cabang)
 		->where('is_paid', '<>', 1)
-		->where('is_taken', '<>', 1)->get();
+		->orWhere('is_taken', '<>', 1)
+		->orderBy('tanggal', 'desc')->get();
 
 		if ($result->isEmpty()) 
 		{
@@ -56,20 +69,25 @@ class TransaksiController extends Controller
         return response()->json(['errorCode' => 0, 'data' => $result], 200);
 	}
 
-	public function paidTransaction(Request $request){
+	public function paid(Request $request){
 		$paid = DB::statement("CALL procedure_paid_laundry(:id_transaksi)", array(
 			"id_transaksi" => $request->id_transaksi
 		));
 
+
+		$result = DB::table('view_laporan_transaksi_cabang')
+				->where('id_transaksi_laundry', $request->id_transaksi)
+				->first();
+
 		$response = [
 			'errorCode' => 0,
-			'data' => null
+			'data' => $result
 		];
 
 		return response()->json($response, 200);
 	}
 
-	public function takeTransaction(Request $request){
+	public function take(Request $request){
 		
 		$exists = DB::table('transaksi_laundry')
 				->where('id_transaksi_laundry', $request->id_transaksi)
@@ -80,7 +98,7 @@ class TransaksiController extends Controller
 			return response()->json(['errorCode' => -98, 'data' => null]);
 		}
 
-		if($exists->is_paid == 1){
+		if($exists->is_paid == 0){
 			return response()->json(['errorCode' => -1, 'data' => null]);
 		}
 
@@ -88,11 +106,32 @@ class TransaksiController extends Controller
 			"id_transaksi" => $request->id_transaksi
 		));
 
+		$result = DB::table('view_laporan_transaksi_cabang')
+				->where('id_transaksi_laundry', $request->id_transaksi)
+				->first();
+		
+
 		$response = [
 			'errorCode' => 0,
-			'data' => null
+			'data' => $result
 		];
 
 		return response()->json($response, 200);
+	}
+
+	public function showFinishedTransaction(Request $request){
+		$result = DB::table('view_laporan_transaksi_cabang')
+		->where('id_cabang', $request->id_cabang)
+		->where('is_paid', 1)
+		->Where('is_taken', 1)
+		->orderBy('tanggal', 'desc')->get();
+
+		if ($result->isEmpty()) 
+		{
+    		return response()->json(['errorCode' => 0, 'data' => []], 200);
+		}
+
+        return response()->json(['errorCode' => 0, 'data' => $result], 200);
+	
 	}
 }

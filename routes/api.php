@@ -43,7 +43,10 @@ Route::get('menu/show', 'MenuController@show');
 //Route Transaksi
 Route::post('transaksi/store', 'TransaksiController@store');
 Route::get('transaksi/showUnfinished', 'TransaksiController@showUnfinished');
-
+Route::put('transaksi/paid', 'TransaksiController@paid');
+Route::put('transaksi/take', 'TransaksiController@take');
+Route::get('transaksi/getTransaction', 'TransaksiController@getTransaction');
+Route::get('transaksi/showFinishedTransaction', 'TransaksiController@showFinishedTransaction');
 //Route AktivitasLaundry
 
 Route::get('aktivitaslaundry/show', 'AktivitasLaundryController@show');
