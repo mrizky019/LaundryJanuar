@@ -52,3 +52,8 @@ Route::get('transaksi/showFinishedTransaction', 'TransaksiController@showFinishe
 Route::get('aktivitaslaundry/show', 'AktivitasLaundryController@show');
 Route::post('aktivitaslaundry/melakukanAktivitasLaundry', 'AktivitasLaundryController@melakukanAktivitasLaundry');
 Route::post('aktivitaslaundry/menyelesaikanAktivitasLaundry', 'AktivitasLaundryController@menyelesaikanAktivitasLaundry');
+
+//route laporan
+Route::get('laporan/getTransaksiCabang', 'LaporanController@getTransaksiCabang');
+Route::get('laporan/getStockCabangAll', 'LaporanController@getStockCabangAll');
+Route::get('laporan/getStockCabang', 'LaporanController@getStockCabang');
