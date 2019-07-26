@@ -12,7 +12,7 @@ use GuzzleHttp\Client;
 class TransaksiController extends Controller
 {
 	public function insert_transaksi_laundry(Request $request){
-		try{
+		
 			DB::table('transaksi_laundry')->insert([
 				'id_server' => $request->id_server,
 				'id_transaksi_laundry' => $request->id_transaksi_laundry,
@@ -26,23 +26,26 @@ class TransaksiController extends Controller
 				'updated_at' => $request->updated_at
 			]);
 
-		}
-		catch(Exception $e){
+			
+		$response = [
+			'errorCode' => 0,
+			'data' => null
+		];
 
-		}
+		return response()->json($response, 200);
 	}
 
 	public function insert_detail_transaksi_laundry(Request $request){
 		
 		DB::table('detail_laundry')->insert([
 			'id_server' => $request->id_server,
-			'id_detail_laundry' => $request->id_detail_laundry,
 			'id_transaksi_laundry' => $request->id_transaksi_laundry,
+			'id_detail_laundry' => $request->id_detail_laundry,
 			'id_menu' => $request->id_menu,
 			'id_harga_menu' => $request->id_harga_menu,
 			'quantity' => $request->quantity,
 			'real_quantity' => $request->real_quantity,
-			'waktu_pengambilan' => $request->waktu_pengambilan,
+			'info' => $request->info,
 			'created_at' => $request->created_at,
 			'updated_at' => $request->updated_at
 		]);
@@ -85,7 +88,7 @@ class TransaksiController extends Controller
 		
 		$data_detail_id = DB::select('select @o_id_detail_transaksi_laundry as id_detail_transaksi_laundry')[0];
 
-		$data_detail = DB::table('detail_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry);
+		$data_detail = DB::table('detail_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry)->first();
 
 		//insert ke server lain
 
@@ -107,8 +110,31 @@ class TransaksiController extends Controller
 							'updated_at' => $data_transaksi->updated_at
 						]
 					]);
+				$status = $transaksi_1->getStatusCode();
+				if($status == 200){
+					$detail_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_detail_transaksi_laundry", [
+						'form_params' => [
+							'id_server' => $data_detail->id_server,
+							'id_transaksi_laundry' => $data_detail->id_transaksi_laundry,
+							'id_detail_laundry' => $data_detail->id_detail_laundry,
+							'id_menu' => $data_detail->id_menu,
+							'id_harga_menu' => $data_detail->id_harga_menu,
+							'quantity' => $data_detail->quantity,
+							'real_quantity' => $data_detail->real_quantity,
+							'info' => $data_detail->info,
+							'created_at' => $data_detail->created_at,
+							'updated_at' => $data_detail->updated_at
+						]
+					]);
+
+				}else{
+					// The server responded with some error. You can throw back your exception
+					// to the calling function or decide to handle it here
+
+					throw new \Exception('Failed');
+				}
 			}
-			catch(Exception $e){
+			catch(\Guzzle\Http\Exception\ConnectException $e){
 				
 			}
 
