@@ -102,7 +102,18 @@ class TransaksiController extends Controller
 
 		foreach(get_server($id_server) as $key => $value){
 			$result = $client->post($value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
-						$data_transaksi
+						'form_params' => [
+							'id_server' => $data_transaksi->id_server,
+							'id_detail_laundry' => $data_transaksi->id_transaksi_laundry,
+							'id_transaksi_laundry' => $data_transaksi->id_cabang,
+							'id_menu' => $data_transaksi->id_pelanggan,
+							'id_harga_menu' => $data_transaksi->tanggal,
+							'quantity' => $data_transaksi->is_paid,
+							'real_quantity' => $data_transaksi->is_taken,
+							'waktu_pengambilan' => $data_transaksi->waktu_pengambilan,
+							'created_at' => $data_transaksi->created_at,
+							'updated_at' => $data_transaksi->updated_at
+						]
 					]);
 		}
 
