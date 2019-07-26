@@ -49,7 +49,6 @@ Route::get('transaksi/getTransaction', 'TransaksiController@getTransaction');
 Route::get('transaksi/showFinishedTransaction', 'TransaksiController@showFinishedTransaction');
 //Route Transaksi Other Server
 Route::post('transaksi/other_server/insert_transaksi_laundry', 'TransaksiController@insert_transaksi_laundry');
-Route::post('transaksi/other_server/insert_detail_transaksi_laundry', 'TransaksiController@insert_detail_transaksi_laundry');
 
 
 //Route AktivitasLaundry

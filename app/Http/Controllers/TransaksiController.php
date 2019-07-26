@@ -14,42 +14,38 @@ class TransaksiController extends Controller
 	public function insert_transaksi_laundry(Request $request){
 		
 			DB::table('transaksi_laundry')->insert([
-				'id_server' => $request->id_server,
-				'id_transaksi_laundry' => $request->id_transaksi_laundry,
+				'id_server' => $request->id_server_master,
+				'id_transaksi_laundry' => $request->id_transaksi_laundry_master,
 				'id_cabang' => $request->id_cabang,
 				'id_pelanggan' => $request->id_pelanggan,
 				'tanggal' => $request->tanggal,
 				'is_paid' => $request->is_paid,
 				'is_taken' => $request->is_taken,
 				'waktu_pengambilan' => $request->waktu_pengambilan,
-				'created_at' => $request->created_at,
-				'updated_at' => $request->updated_at
+				'created_at' => $request->created_at_master,
+				'updated_at' => $request->updated_at_master
 			]);
 
+			DB::table('detail_laundry')->insert([
+				'id_server' => $request->id_server_detail,
+				'id_transaksi_laundry' => $request->id_transaksi_laundry_detail,
+				'id_detail_laundry' => $request->id_detail_laundry,
+				'id_menu' => $request->id_menu,
+				'id_harga_menu' => $request->id_harga_menu,
+				'quantity' => $request->quantity,
+				'real_quantity' => $request->real_quantity,
+				'info' => $request->info,
+				'created_at' => $request->created_at_detail,
+				'updated_at' => $request->updated_at_detail
+			]);
+
+			$data_aktivitas = json_decode($request->aktivitas, true);
+
+			DB::table('aktivitas_laundry')->insert(
+				$data_aktivitas
+			);
+
 			
-		$response = [
-			'errorCode' => 0,
-			'data' => null
-		];
-
-		return response()->json($response, 200);
-	}
-
-	public function insert_detail_transaksi_laundry(Request $request){
-		
-		DB::table('detail_laundry')->insert([
-			'id_server' => $request->id_server,
-			'id_transaksi_laundry' => $request->id_transaksi_laundry,
-			'id_detail_laundry' => $request->id_detail_laundry,
-			'id_menu' => $request->id_menu,
-			'id_harga_menu' => $request->id_harga_menu,
-			'quantity' => $request->quantity,
-			'real_quantity' => $request->real_quantity,
-			'info' => $request->info,
-			'created_at' => $request->created_at,
-			'updated_at' => $request->updated_at
-		]);
-
 		$response = [
 			'errorCode' => 0,
 			'data' => null
@@ -90,42 +86,44 @@ class TransaksiController extends Controller
 
 		$data_detail = DB::table('detail_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry)->first();
 
+		$data_aktivitas = DB::table('aktivitas_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry)->get()->toJson();
+
 		//insert ke server lain
 
-		$client = new Client(); //GuzzleHttp\Client
+		$client = new Client(['http_errors' => false]); //GuzzleHttp\Client
 
 		foreach($other_ip as $key => $value){
 			try{
 				$transaksi_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
 						'form_params' => [
-							'id_server' => $data_transaksi->id_server,
-							'id_transaksi_laundry' => $data_transaksi->id_transaksi_laundry,
+							'id_server_master' => $data_transaksi->id_server,
+							'id_transaksi_laundry_master' => $data_transaksi->id_transaksi_laundry,
 							'id_cabang' => $data_transaksi->id_cabang,
 							'id_pelanggan' => $data_transaksi->id_pelanggan,
 							'tanggal' => $data_transaksi->tanggal,
 							'is_paid' => $data_transaksi->is_paid,
 							'is_taken' => $data_transaksi->is_taken,
 							'waktu_pengambilan' => $data_transaksi->waktu_pengambilan,
-							'created_at' => $data_transaksi->created_at,
-							'updated_at' => $data_transaksi->updated_at
-						]
-					]);
-				$status = $transaksi_1->getStatusCode();
-				if($status == 200){
-					$detail_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_detail_transaksi_laundry", [
-						'form_params' => [
-							'id_server' => $data_detail->id_server,
-							'id_transaksi_laundry' => $data_detail->id_transaksi_laundry,
+							'created_at_master' => $data_transaksi->created_at,
+							'updated_at_master' => $data_transaksi->updated_at,
+							'id_server_detail' => $data_detail->id_server,
+							'id_transaksi_laundry_detail' => $data_detail->id_transaksi_laundry,
 							'id_detail_laundry' => $data_detail->id_detail_laundry,
 							'id_menu' => $data_detail->id_menu,
 							'id_harga_menu' => $data_detail->id_harga_menu,
 							'quantity' => $data_detail->quantity,
 							'real_quantity' => $data_detail->real_quantity,
 							'info' => $data_detail->info,
-							'created_at' => $data_detail->created_at,
-							'updated_at' => $data_detail->updated_at
+							'created_at_detail' => $data_transaksi->created_at,
+							'updated_at_detail' => $data_transaksi->updated_at,
+							'aktivitas' => $data_aktivitas
 						]
 					]);
+
+
+				$status = $transaksi_1->getStatusCode();
+				if($status == 200){
+				
 
 				}else{
 					// The server responded with some error. You can throw back your exception
@@ -136,6 +134,9 @@ class TransaksiController extends Controller
 			}
 			catch(\Guzzle\Http\Exception\ConnectException $e){
 				
+			}
+			catch(\Exception $ex){
+
 			}
 
 		}
