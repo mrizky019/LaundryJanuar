@@ -11,17 +11,6 @@ use GuzzleHttp\Client;
 
 class TransaksiController extends Controller
 {
-
-	private function get_server($id){
-		$other_ip = [];
-		foreach(config('app.IP_SERVER') as $key => $value){
-			if($key != $id-1){
-				array_push($other_ip, $value);
-			}
-		}
-		return $other_ip;
-	}
-
 	public function insert_transaksi_laundry(Request $request){
 		try{
 			DB::table('transaksi_laundry')->insert([
@@ -44,33 +33,35 @@ class TransaksiController extends Controller
 	}
 
 	public function insert_detail_transaksi_laundry(Request $request){
-		try{
-			DB::table('detail_laundry')->insert([
-				'id_server' => $request->id_server,
-				'id_detail_laundry' => $request->id_transaksi_laundry,
-				'id_transaksi_laundry' => $request->id_cabang,
-				'id_menu' => $request->id_pelanggan,
-				'id_harga_menu' => $request->tanggal,
-				'quantity' => $request->is_paid,
-				'real_quantity' => $request->is_taken,
-				'waktu_pengambilan' => $request->waktu_pengambilan,
-				'created_at' => $request->created_at,
-				'updated_at' => $request->updated_at
-			]);
+		
+		DB::table('detail_laundry')->insert([
+			'id_server' => $request->id_server,
+			'id_detail_laundry' => $request->id_detail_laundry,
+			'id_transaksi_laundry' => $request->id_transaksi_laundry,
+			'id_menu' => $request->id_menu,
+			'id_harga_menu' => $request->id_harga_menu,
+			'quantity' => $request->quantity,
+			'real_quantity' => $request->real_quantity,
+			'waktu_pengambilan' => $request->waktu_pengambilan,
+			'created_at' => $request->created_at,
+			'updated_at' => $request->updated_at
+		]);
 
-		}
-		catch(Exception $e){
+		$response = [
+			'errorCode' => 0,
+			'data' => null
+		];
 
-		}
+		return response()->json($response, 200);
 	}
 
     public function store(Request $request)
     {
 		$id_server = $request->id_server;
 
-		$other_ip = $this.get_server($id_server);
+		$other_ip = get_server($id_server);
 
-		DB::statement("CALL procedure_new_transaksi_laundry(:id_cabang, :id_pelanggan, :id_server, @o_id_transaksi_laundry)",
+		DB::statement("CALL procedure_new_transaksi_laundry(:id_server, :id_cabang, :id_pelanggan, @o_id_transaksi_laundry)",
 			array(
 				'id_server' => $request->id_server,
 				'id_cabang'=> $request->id_cabang,
@@ -78,49 +69,55 @@ class TransaksiController extends Controller
 			)	
 		);
 
-		$inserted_transaksi_id = DB::select('select @o_id_transaksi_laundry as id_transaksi_laundry')[0];
+		$data_master_id = DB::select('select @o_id_transaksi_laundry as id_transaksi_laundry')[0];
 
-		$data_transaksi = DB::table('transaksi_laundry')->where('id_transaksi_laundry', $inserted_id)->first();
+		$data_transaksi = DB::table('transaksi_laundry')->where('id_transaksi_laundry', $data_master_id->id_transaksi_laundry)->first();
 
         DB::statement("CALL procedure_new_detail_laundry(:id_server, :id_transaksi_laundry, :id_menu, :real_quantity, :info, @o_id_detail_transaksi_laundry)", 
         	array(
 				'id_server' => $id_server,
-	        	'id_transaksi_laundry' => $data->id_transaksi_laundry,
+	        	'id_transaksi_laundry' => $data_master_id->id_transaksi_laundry,
 	        	'id_menu'	=> $request->id_menu,
 	        	'real_quantity'	=> $request->real_quantity,
 	        	'info'	=> $request->info,
         	)
 		);
 		
-		$inserted_detail_transaksi_id = DB::select('select @o_id_detail_transaksi_laundry as id_detail_transaksi_laundry')[0];
+		$data_detail_id = DB::select('select @o_id_detail_transaksi_laundry as id_detail_transaksi_laundry')[0];
 
-		$data_detail = DB::table('detail_laundry')->where('id_detail_laundry', $inserted_detail_transaksi_id);
+		$data_detail = DB::table('detail_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry);
 
 		//insert ke server lain
 
 		$client = new Client(); //GuzzleHttp\Client
 
-		foreach(get_server($id_server) as $key => $value){
-			$result = $client->post($value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
+		foreach($other_ip as $key => $value){
+			try{
+				$transaksi_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
 						'form_params' => [
 							'id_server' => $data_transaksi->id_server,
-							'id_detail_laundry' => $data_transaksi->id_transaksi_laundry,
-							'id_transaksi_laundry' => $data_transaksi->id_cabang,
-							'id_menu' => $data_transaksi->id_pelanggan,
-							'id_harga_menu' => $data_transaksi->tanggal,
-							'quantity' => $data_transaksi->is_paid,
-							'real_quantity' => $data_transaksi->is_taken,
+							'id_transaksi_laundry' => $data_transaksi->id_transaksi_laundry,
+							'id_cabang' => $data_transaksi->id_cabang,
+							'id_pelanggan' => $data_transaksi->id_pelanggan,
+							'tanggal' => $data_transaksi->tanggal,
+							'is_paid' => $data_transaksi->is_paid,
+							'is_taken' => $data_transaksi->is_taken,
 							'waktu_pengambilan' => $data_transaksi->waktu_pengambilan,
 							'created_at' => $data_transaksi->created_at,
 							'updated_at' => $data_transaksi->updated_at
 						]
 					]);
+			}
+			catch(Exception $e){
+				
+			}
+
 		}
 
 
 		
         $result = DB::table('view_laporan_transaksi_cabang')
-        ->where('id_transaksi_laundry', $data->id_transaksi_laundry)->get()[0];
+        ->where('id_transaksi_laundry', $data_master_id->id_transaksi_laundry)->get()[0];
 
         $response = [
         	'errorCode' => 0,
