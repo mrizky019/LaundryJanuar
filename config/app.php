@@ -228,4 +228,6 @@ return [
 
     ],
 
+    'IP_SERVER' => explode(',', env('IP_SERVER'))
+
 ];

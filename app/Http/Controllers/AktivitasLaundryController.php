@@ -7,6 +7,12 @@ use App\Http\Controllers\Controller;
 use DB;
 class AktivitasLaundryController extends Controller
 {
+
+    public function insert_aktivitas_laundry($data)
+    {
+        
+    }
+
     public function show(Request $request){
         $data = DB::table("view_get_aktivitas_laundry")->where("id_transaksi_laundry", $request->id_transaksi_laundry)
                     ->get();
