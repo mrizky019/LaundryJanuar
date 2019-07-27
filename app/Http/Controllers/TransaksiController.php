@@ -120,7 +120,7 @@ class TransaksiController extends Controller
 		foreach($other_ip as $key => $value){
 
 			try{
-				$transaksi_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
+				$transaksi_1 = $client->post("http://".$value."/api/transaksi/other_server/insert_transaksi_laundry", [
 						'form_params' => [
 							'id_server_master' => $data_transaksi->id_server,
 							'id_transaksi_laundry_master' => $data_transaksi->id_transaksi_laundry,
@@ -206,7 +206,7 @@ class TransaksiController extends Controller
 
 				$client = new Client(['http_errors' => false]);
 				
-				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
+				$response_transaksi = $client->get("http://".$value."/api/transaksi/other_server/get_transaksi_laundry_other_server");
 				
 				
 				if($response_transaksi->getStatusCode()==200){
@@ -246,7 +246,7 @@ class TransaksiController extends Controller
 						}
 
 					}
-					$response_detail_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
+					$response_detail_transaksi = $client->get("http://".$value."/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
 					if($response_detail_transaksi->getStatusCode()==200){
 						$content_detail_transaksi = json_decode($response_detail_transaksi->getBody()->getContents());
 						
@@ -284,7 +284,7 @@ class TransaksiController extends Controller
 
 						}
 
-						$response_detail_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
+						$response_detail_transaksi = $client->get("http://".$value."/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
 						if($response_detail_transaksi->getStatusCode()==200){
 							$content_aktivitas = json_decode($response_detail_transaksi->getBody()->getContents());
 							
@@ -407,7 +407,7 @@ class TransaksiController extends Controller
 
 				$client = new Client(['http_errors' => false]);
 				
-				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
+				$response_transaksi = $client->get("http://".$value."/api/transaksi/other_server/get_transaksi_laundry_other_server");
 				if($response_transaksi->getStatusCode()==200){
 					$content_transaksi = json_decode($response_transaksi->getBody()->getContents());
 					
@@ -445,7 +445,7 @@ class TransaksiController extends Controller
 						}
 
 					}
-					$response_detail_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
+					$response_detail_transaksi = $client->get("http://".$value."/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
 					if($response_detail_transaksi->getStatusCode()==200){
 						$content_detail_transaksi = json_decode($response_detail_transaksi->getBody()->getContents());
 						
@@ -483,7 +483,7 @@ class TransaksiController extends Controller
 
 						}
 
-						$response_detail_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
+						$response_detail_transaksi = $client->get("http://".$value."/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
 						if($response_detail_transaksi->getStatusCode()==200){
 							$content_aktivitas = json_decode($response_detail_transaksi->getBody()->getContents());
 							
