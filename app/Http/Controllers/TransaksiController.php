@@ -401,6 +401,7 @@ class TransaksiController extends Controller
 											->where('id_server', $d->id_server)
 											->where('id_transaksi_laundry', $d->id_transaksi_laundry)
 											->update($arrayData);
+											
 									}
 								} else {
 									$update = DB::table("transaksi_laundry")
