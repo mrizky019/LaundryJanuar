@@ -226,7 +226,7 @@ class TransaksiController extends Controller
 									$arrayData	
 								);
 						} else {
-							if($det->updated_at != null){
+							if($d->updated_at != null){
 								if($exists->updated_at != null){
 									if(strtotime($exists->updated_at) < strtotime($d->updated_at)){
 										DB::table("transaksi_laundry")
@@ -424,7 +424,7 @@ class TransaksiController extends Controller
 									$arrayData	
 								);
 						} else {
-							if($det->updated_at != null){
+							if($d->updated_at != null){
 								if($exists->updated_at != null){
 									if(strtotime($exists->updated_at) < strtotime($d->updated_at)){
 										DB::table("transaksi_laundry")
