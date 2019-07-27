@@ -325,8 +325,7 @@ class TransaksiController extends Controller
 				}
 			}
 			catch(\Exception $e){	
-				var_dump($response_transaksi->getStatusCode());
-				die();
+				
 			}
 			
 		}
