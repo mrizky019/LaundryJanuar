@@ -54,6 +54,30 @@ class TransaksiController extends Controller
 		return response()->json($response, 200);
 	}
 
+	public function get_transaksi_laundry_other_server(Request $request){
+		
+		$data = DB::table('transaksi_laundry')->get();
+
+		$response = [
+			'errorCode' => 0,
+			'data' => $data
+		];
+
+		return response()->json($response, 200);
+	}
+
+	public function get_detail_transaksi_laundry_other_server(Request $request){
+		
+		$data = DB::table('detail_laundry')->get();
+
+		$response = [
+			'errorCode' => 0,
+			'data' => $data
+		];
+
+		return response()->json($response, 200);
+	}
+
     public function store(Request $request)
     {
 		$id_server = $request->id_server;
@@ -116,7 +140,7 @@ class TransaksiController extends Controller
 							'info' => $data_detail->info,
 							'created_at_detail' => $data_transaksi->created_at,
 							'updated_at_detail' => $data_transaksi->updated_at,
-							'aktivitas' => $data_aktivitas
+							'aktivitas' => $data_aktivitasget
 						]
 					]);
 
@@ -155,6 +179,8 @@ class TransaksiController extends Controller
 	}
 
 	public function getTransaction(Request $request){
+
+
 		$result = DB::table('view_laporan_transaksi_cabang')
 		->where('id_transaksi_laundry', $request->id_transaksi_laundry)->first();
 
@@ -167,6 +193,83 @@ class TransaksiController extends Controller
 	}
 
 	public function showUnfinished(Request $request){
+
+		$client = new Client(['http_errors' => false]); //GuzzleHttp\Client
+
+		
+		$other_ip = get_server($request->id_server);
+
+		foreach($other_ip as $key => $value){
+			try{
+				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
+
+				if($response_transaksi->getStatusCode()==200){
+					$content_transaksi = json_decode($response_transaksi->json());
+
+					$where = array();
+					foreach($content_transaksi as $d){
+						array_push($where, [
+							"id_server" => $d["id_server"],
+							"id_transaksi_laundry" => $d["id_transaksi_laundry"]
+						]);
+					}
+
+					if(!empty($where)){
+						$get = DB::table('transaksi_laudry')
+								->whereRaw(
+									whereNotInMultipleColumn(
+										["id_server", "id_transaksi_laundry"], 
+										$where
+										)
+									)->get()->toArray();
+						if(!empty($get)){
+							DB::table('transaksi_laundry')
+								->insert($get);
+						}
+
+					}
+				}		
+			}
+			catch(\Exception $e){
+
+			}
+
+			try{
+				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
+
+				if($response_transaksi->getStatusCode()==200){
+					$content_transaksi = json_decode($response_transaksi->json());
+
+					$where = array();
+					foreach($content_transaksi as $d){
+						array_push($where, [
+							"id_server" => $d["id_server"],
+							"id_detail_laundry" => $d["id_detail_laundry"]
+						]);
+					}
+
+					if(!empty($where)){
+						$get = DB::table('detail_laudry')
+								->whereRaw(
+									whereNotInMultipleColumn(
+										["id_server", "id_detail_laundry"], 
+										$where
+										)
+									)->get()->toArray();
+						if(!empty($get)){
+							DB::table('detail_laundry')
+								->insert($get);
+						}
+
+					}
+				}		
+			}
+			catch(\Exception $e){
+
+			}
+		}
+
+
 		$result = DB::table('view_laporan_transaksi_cabang')
 		->where('id_cabang', $request->id_cabang)
 		->where('is_paid', '<>', 1)

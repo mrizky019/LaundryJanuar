@@ -13,3 +13,15 @@ if(! function_exists('get_server')){
     }
 
 }
+if(! function_exists('whereNotInMultipleColumn')){
+    function whereNotInMultipleColumn(array $columns, $values){
+		$values = array_map(function (array $value) {
+            return "('".implode($value, "', '")."')"; 
+		}, $values);
+		
+		
+		$return =  '('.implode($columns, ', ').') not in ('.implode($values, ', ').')';
+		return $return;
+	}
+
+}
