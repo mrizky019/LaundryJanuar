@@ -28,7 +28,7 @@ class TransaksiController extends Controller
 
 			DB::table('detail_laundry')->insert([
 				'id_server' => $request->id_server_detail,
-				'id_transaksi_laundry' => $request->id_transaksi_laundry_detail,
+				'id_transaksi_laundry' => $request->id_transaksi_laundry_master,
 				'id_detail_laundry' => $request->id_detail_laundry,
 				'id_menu' => $request->id_menu,
 				'id_harga_menu' => $request->id_harga_menu,
@@ -112,11 +112,13 @@ class TransaksiController extends Controller
 
 		$data_aktivitas = DB::table('aktivitas_laundry')->where('id_detail_laundry', $data_detail_id->id_detail_transaksi_laundry)->get()->toJson();
 
+		
 		//insert ke server lain
 
 		$client = new Client(['http_errors' => false]); //GuzzleHttp\Client
 
 		foreach($other_ip as $key => $value){
+
 			try{
 				$transaksi_1 = $client->post("http://".$value.":8000/api/transaksi/other_server/insert_transaksi_laundry", [
 						'form_params' => [
@@ -140,12 +142,13 @@ class TransaksiController extends Controller
 							'info' => $data_detail->info,
 							'created_at_detail' => $data_transaksi->created_at,
 							'updated_at_detail' => $data_transaksi->updated_at,
-							'aktivitas' => $data_aktivitasget
+							'aktivitas' => $data_aktivitas
 						]
 					]);
 
-
 				$status = $transaksi_1->getStatusCode();
+				
+				
 				if($status == 200){
 				
 
@@ -194,113 +197,158 @@ class TransaksiController extends Controller
 
 	public function showUnfinished(Request $request){
 
-		$client = new Client(['http_errors' => false]); //GuzzleHttp\Client
-
 		
-		$other_ip = get_server($request->id_server);
+		$other_ip = get_server($request->id_server); //GuzzleHttp\Client
+
 
 		foreach($other_ip as $key => $value){
 			try{
+				$self_transaksi = DB::table('transaksi_laundry')->select('id_server', 'id_transaksi_laundry')->get();
+
+				$client = new Client(['http_errors' => false]);
+				
 				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
-
 				if($response_transaksi->getStatusCode()==200){
-					$content_transaksi = json_decode($response_transaksi->json());
-
+					$content_transaksi = json_decode($response_transaksi->getBody()->getContents());
+					
+				
 					$where = array();
-					foreach($content_transaksi as $d){
-						array_push($where, [
-							"id_server" => $d["id_server"],
-							"id_transaksi_laundry" => $d["id_transaksi_laundry"]
-						]);
-					}
+					foreach($content_transaksi->data as $d){
 
-					if(!empty($where)){
-						$get = DB::table('transaksi_laudry')
-								->whereRaw(
-									whereNotInMultipleColumn(
-										["id_server", "id_transaksi_laundry"], 
-										$where
-										)
-									)->get()->toArray();
-						if(!empty($get)){
-							DB::table('transaksi_laundry')
-								->insert($get);
+						$arrayData = (array)$d;
+						$exists = DB::table('transaksi_laundry')
+						->where("id_server", $d->id_server)->where("id_transaksi_laundry",$d->id_transaksi_laundry)->first();
+
+						if($exists == null){
+							DB::table("transaksi_laundry")
+								->insert(
+									$arrayData	
+								);
+						} else {
+
 						}
 
 					}
-				}		
+					$response_detail_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
+					if($response_detail_transaksi->getStatusCode()==200){
+						$content_detail_transaksi = json_decode($response_detail_transaksi->getBody()->getContents());
+						
+					
+						$where = array();
+						foreach($content_detail_transaksi->data as $det){
+
+							$arrayDataDetail = (array)$det;
+							$exists = DB::table('detail_laundry')
+							->where("id_server", $det->id_server)->where("id_detail_laundry",$det->id_detail_laundry)->first();
+
+							if($exists == null){
+								DB::table("detail_laundry")
+									->insert(
+										$arrayDataDetail
+									);
+							} else {
+
+							}
+
+						}
+
+						$response_detail_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
+						if($response_detail_transaksi->getStatusCode()==200){
+							$content_aktivitas = json_decode($response_detail_transaksi->getBody()->getContents());
+							
+						
+							$where = array();
+							foreach($content_aktivitas->data as $akt){
+
+								$arrayDataAktivitas = (array)$akt;
+								$exists = DB::table('aktivitas_laundry')
+								->where("id_server", $akt->id_server)->where("id_aktivitas_laundry",$akt->id_aktivitas_laundry)->first();
+
+								if($exists == null){
+									DB::table("aktivitas_laundry")
+										->insert(
+											$arrayDataAktivitas
+										);
+								} else {
+
+								}
+
+							}
+						}
+					}		
+				}
 			}
 			catch(\Exception $e){
 
 			}
 
-			try{
-				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
+			// try{
+			// 	$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_detail_transaksi_laundry_other_server");
 
-				if($response_transaksi->getStatusCode()==200){
-					$content_transaksi = json_decode($response_transaksi->json());
+			// 	if($response_transaksi->getStatusCode()==200){
+			// 		$content_transaksi = json_decode($response_transaksi->json());
 
-					$where = array();
-					foreach($content_transaksi as $d){
-						array_push($where, [
-							"id_server" => $d["id_server"],
-							"id_detail_laundry" => $d["id_detail_laundry"]
-						]);
-					}
+			// 		$where = array();
+			// 		foreach($content_transaksi as $d){
+			// 			array_push($where, [
+			// 				"id_server" => $d["id_server"],
+			// 				"id_detail_laundry" => $d["id_detail_laundry"]
+			// 			]);
+			// 		}
 
-					if(!empty($where)){
-						$get = DB::table('detail_laudry')
-								->whereRaw(
-									whereNotInMultipleColumn(
-										["id_server", "id_detail_laundry"], 
-										$where
-										)
-									)->get()->toArray();
-						if(!empty($get)){
-							DB::table('detail_laundry')
-								->insert($get);
-						}
+			// 		if(!empty($where)){
+			// 			$get = DB::table('detail_laudry')
+			// 					->whereRaw(
+			// 						whereNotInMultipleColumn(
+			// 							["id_server", "id_detail_laundry"], 
+			// 							$where
+			// 							)
+			// 						)->get()->toArray();
+			// 			if(!empty($get)){
+			// 				DB::table('detail_laundry')
+			// 					->insert($get);
+			// 			}
 
-					}
-				}		
-			}
-			catch(\Exception $e){
+			// 		}
+			// 	}		
+			// }
+			// catch(\Exception $e){
 
-			}
+			// }
 
-			try{
-				$response_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
+			// try{
+			// 	$response_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
 
-				if($response_transaksi->getStatusCode()==200){
-					$content_transaksi = json_decode($response_transaksi->json());
+			// 	if($response_transaksi->getStatusCode()==200){
+			// 		$content_transaksi = json_decode($response_transaksi->json());
 
-					$where = array();
-					foreach($content_transaksi as $d){
-						array_push($where, [
-							"id_server" => $d["id_server"],
-							"id_aktivitas_laundry" => $d["id_aktivitas_laundry"]
-						]);
-					}
+			// 		$where = array();
+			// 		foreach($content_transaksi as $d){
+			// 			array_push($where, [
+			// 				"id_server" => $d["id_server"],
+			// 				"id_aktivitas_laundry" => $d["id_aktivitas_laundry"]
+			// 			]);
+			// 		}
 
-					if(!empty($where)){
-						$get = DB::table('aktivitas_laundry')
-								->whereRaw(
-									whereNotInMultipleColumn(
-										["id_server", "id_aktivitas_laundry"], 
-										$where
-										)
-									)->get()->toArray();
-						if(!empty($get)){
-							DB::table('aktivitas_laundry')
-								->insert($get);
-						}
+			// 		if(!empty($where)){
+			// 			$get = DB::table('aktivitas_laundry')
+			// 					->whereRaw(
+			// 						whereNotInMultipleColumn(
+			// 							["id_server", "id_aktivitas_laundry"], 
+			// 							$where
+			// 							)
+			// 						)->get()->toArray();
+			// 			if(!empty($get)){
+			// 				DB::table('aktivitas_laundry')
+			// 					->insert($get);
+			// 			}
 
-					}
-				}		
-			}
-			catch(\Exception $e){
+			// 		}
+			// 	}		
+			// }
+			// catch(\Exception $e){
 
-			}
+			// }
 			
 		}
 
