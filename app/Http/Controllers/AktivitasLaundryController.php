@@ -33,14 +33,15 @@ class AktivitasLaundryController extends Controller
     }
 
     public function melakukanAktivitasLaundry(Request $request){
-        $data = DB::statement('CALL procedure_mengerjakan_aktivitas_laundry(:p_id_aktivitas_laundry, :p_id_pegawai)',
+        $data = DB::statement('CALL procedure_mengerjakan_aktivitas_laundry(:p_id_server, :p_id_aktivitas_laundry, :p_id_pegawai)',
         array(
+            'p_id_server' => $request->id_server,
             'p_id_aktivitas_laundry' => $request->id_aktivitas_laundry,
             'p_id_pegawai' => $request->id_pegawai
         ));
 
         $aktivitas = DB::table("view_get_aktivitas_laundry")->where("id_aktivitas_laundry", $request->id_aktivitas_laundry)
-                    ->get()[0];
+                    ->first();
 
         $response = [
             'errorCode' => 0,

@@ -270,9 +270,23 @@ class TransaksiController extends Controller
 											$arrayDataAktivitas
 										);
 								} else {
-
+									if($akt->updated_at != null){
+										if($exists->updated_at != null){
+											if(strtotime($exists->updated_at) < strtotime($akt->updated_at)){
+												DB::table("aktivitas_laundry")
+													->where('id_server', $akt->id_server)
+													->where('id_aktivitas_laundry', $akt->id_aktivitas_laundry)
+													->update($arrayDataAktivitas);
+											}
+										} else {
+											$update = DB::table("aktivitas_laundry")
+													->where('id_server', $akt->id_server)
+													->where('id_aktivitas_laundry', $akt->id_aktivitas_laundry)
+													->update($arrayDataAktivitas);
+											
+										}
+									}
 								}
-
 							}
 						}
 					}		
