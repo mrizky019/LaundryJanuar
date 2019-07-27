@@ -8,10 +8,17 @@ use DB;
 class AktivitasLaundryController extends Controller
 {
 
-    public function insert_aktivitas_laundry($data)
-    {
-        
-    }
+    public function get_aktivitas_laundry_other_server(Request $request){
+		
+		$data = DB::table('aktivitas_laundry')->get();
+
+		$response = [
+			'errorCode' => 0,
+			'data' => $data
+		];
+
+		return response()->json($response, 200);
+	}
 
     public function show(Request $request){
         $data = DB::table("view_get_aktivitas_laundry")->where("id_transaksi_laundry", $request->id_transaksi_laundry)

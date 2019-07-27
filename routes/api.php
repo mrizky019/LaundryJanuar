@@ -57,6 +57,7 @@ Route::get('transaksi/other_server/get_detail_transaksi_laundry_other_server', '
 Route::get('aktivitaslaundry/show', 'AktivitasLaundryController@show');
 Route::put('aktivitaslaundry/melakukanAktivitasLaundry', 'AktivitasLaundryController@melakukanAktivitasLaundry');
 Route::put('aktivitaslaundry/menyelesaikanAktivitasLaundry', 'AktivitasLaundryController@menyelesaikanAktivitasLaundry');
+Route::get('aktivitaslaundry/other_server/get_aktivitas_laundry_other_server', 'AktivitasLaundryController@get_aktivitas_laundry_other_server');
 
 //route laporan
 Route::get('laporan/getTransaksiCabang', 'LaporanController@getTransaksiCabang');

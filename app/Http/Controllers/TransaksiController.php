@@ -267,6 +267,41 @@ class TransaksiController extends Controller
 			catch(\Exception $e){
 
 			}
+
+			try{
+				$response_transaksi = $client->get("http://".$value.":8000/api/aktivitaslaundry/other_server/get_aktivitas_laundry_other_server");
+
+				if($response_transaksi->getStatusCode()==200){
+					$content_transaksi = json_decode($response_transaksi->json());
+
+					$where = array();
+					foreach($content_transaksi as $d){
+						array_push($where, [
+							"id_server" => $d["id_server"],
+							"id_aktivitas_laundry" => $d["id_aktivitas_laundry"]
+						]);
+					}
+
+					if(!empty($where)){
+						$get = DB::table('aktivitas_laundry')
+								->whereRaw(
+									whereNotInMultipleColumn(
+										["id_server", "id_aktivitas_laundry"], 
+										$where
+										)
+									)->get()->toArray();
+						if(!empty($get)){
+							DB::table('aktivitas_laundry')
+								->insert($get);
+						}
+
+					}
+				}		
+			}
+			catch(\Exception $e){
+
+			}
+			
 		}
 
 
