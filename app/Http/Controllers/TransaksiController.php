@@ -208,9 +208,7 @@ class TransaksiController extends Controller
 				
 				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
 				
-				var_dump($response_transaksi->getStatusCode());
-				die();
-
+				
 				if($response_transaksi->getStatusCode()==200){
 					$content_transaksi = json_decode($response_transaksi->getBody()->getContents());
 					
@@ -326,8 +324,9 @@ class TransaksiController extends Controller
 					}		
 				}
 			}
-			catch(\Exception $e){
-
+			catch(\Exception $e){	
+				var_dump($response_transaksi->getStatusCode());
+				die();
 			}
 			
 		}
