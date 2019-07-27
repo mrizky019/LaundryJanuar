@@ -203,12 +203,10 @@ class TransaksiController extends Controller
 		foreach($other_ip as $key => $value){
 			try{
 				$self_transaksi = DB::table('transaksi_laundry')->select('id_server', 'id_transaksi_laundry')->get();
-				
+
 				$client = new Client(['http_errors' => false]);
 				
 				$response_transaksi = $client->get("http://".$value.":8000/api/transaksi/other_server/get_transaksi_laundry_other_server");
-				var_dump($response_transaksi->getStatusCode());
-				die();
 				if($response_transaksi->getStatusCode()==200){
 					$content_transaksi = json_decode($response_transaksi->getBody()->getContents());
 					
@@ -226,7 +224,23 @@ class TransaksiController extends Controller
 									$arrayData	
 								);
 						} else {
-
+							if($det->updated_at != null){
+								if($exists->updated_at != null){
+									if(strtotime($exists->updated_at) < strtotime($d->updated_at)){
+										DB::table("transaksi_laundry")
+											->where('id_server', $d->id_server)
+											->where('id_transaksi_laundry', $d->id_transaksi_laundry)
+											->update($arrayData);
+											
+									}
+								} else {
+									$update = DB::table("transaksi_laundry")
+											->where('id_server', $d->id_server)
+											->where('id_transaksi_laundry', $d->id_transaksi_laundry)
+											->update($arrayData);
+									
+								}
+							}
 						}
 
 					}
@@ -248,7 +262,22 @@ class TransaksiController extends Controller
 										$arrayDataDetail
 									);
 							} else {
-
+								if($det->updated_at != null){
+										if($exists->updated_at != null){
+											if(strtotime($exists->updated_at) < strtotime($det->updated_at)){
+												DB::table("detail_laundry")
+													->where('id_server', $det->id_server)
+													->where('id_detail_laundry', $det->id_detail_laundry)
+													->update($arrayDataDetail);
+											}
+										} else {
+											$update = DB::table("detail_laundry")
+													->where('id_server', $det->id_server)
+													->where('id_detail_laundry', $det->id_detail_laundry)
+													->update($arrayDataDetail);
+											
+										}
+									}
 							}
 
 						}
@@ -272,7 +301,6 @@ class TransaksiController extends Controller
 										);
 								} else {
 									if($akt->updated_at != null){
-										
 										if($exists->updated_at != null){
 											if(strtotime($exists->updated_at) < strtotime($akt->updated_at)){
 												DB::table("aktivitas_laundry")
@@ -401,7 +429,7 @@ class TransaksiController extends Controller
 											->where('id_server', $d->id_server)
 											->where('id_transaksi_laundry', $d->id_transaksi_laundry)
 											->update($arrayData);
-											
+
 									}
 								} else {
 									$update = DB::table("transaksi_laundry")
