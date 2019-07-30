@@ -61,5 +61,3 @@ Route::get('aktivitaslaundry/other_server/get_aktivitas_laundry_other_server', '
 
 //route laporan
 Route::get('laporan/getTransaksiCabang', 'LaporanController@getTransaksiCabang');
-Route::get('laporan/getStockCabangAll', 'LaporanController@getStockCabangAll');
-Route::get('laporan/getStockCabang', 'LaporanController@getStockCabang');

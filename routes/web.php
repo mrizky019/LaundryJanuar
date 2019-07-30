@@ -12,5 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/transaction', 'LaporanController@viewTransactionReport')->name('transaction');
+
+Route::get('/branch', 'LaporanController@viewBranchReport')->name('branch');
